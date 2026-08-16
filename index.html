@@ -1,0 +1,898 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SolveWithAI | Your AI Study Assistant</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+
+            background:
+                radial-gradient(circle at 10% 20%, rgba(73, 86, 255, 0.45), transparent 30%),
+                radial-gradient(circle at 90% 10%, rgba(139, 55, 255, 0.45), transparent 30%),
+                radial-gradient(circle at 50% 90%, rgba(32, 55, 190, 0.45), transparent 35%),
+                linear-gradient(135deg, #050b2e, #101a68, #30106b, #090d35);
+
+            background-size: 200% 200%;
+            animation: backgroundMove 12s ease infinite;
+        }
+
+        @keyframes backgroundMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(91, 84, 255, 0.15);
+            filter: blur(80px);
+            top: 20%;
+            left: 30%;
+            pointer-events: none;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            width: 100%;
+            padding: 20px 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: #9f8cff;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            color: white;
+            transition: 0.25s;
+        }
+
+        .nav-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.18);
+            transform: translateY(-2px);
+        }
+
+        .subscribe {
+            padding: 11px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7657ff, #a44cff);
+            box-shadow: 0 8px 25px rgba(123, 75, 255, 0.35);
+            font-weight: 700;
+        }
+
+        .subscribe:hover {
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            padding: 65px 20px 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 13px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 8vw, 88px);
+            line-height: 1;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ffffff, #b6a5ff, #8f72ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: 22px auto;
+            color: #cbd0f5;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* AI BOX */
+
+        .workspace {
+            width: min(900px, 92%);
+            margin: 35px auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .ai-card {
+            padding: 25px;
+            border-radius: 25px;
+
+            background: rgba(10, 15, 60, 0.58);
+            border: 1px solid rgba(255,255,255,0.14);
+
+            box-shadow:
+                0 25px 80px rgba(0,0,0,0.35),
+                inset 0 1px rgba(255,255,255,0.08);
+
+            backdrop-filter: blur(25px);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .ai-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+
+            background: linear-gradient(135deg, #685cff, #a448ff);
+            box-shadow: 0 8px 25px rgba(103, 76, 255, 0.35);
+        }
+
+        .card-title h2 {
+            font-size: 20px;
+        }
+
+        .card-title p {
+            font-size: 12px;
+            color: #a9b0dc;
+            margin-top: 2px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+
+            padding: 20px;
+
+            border-radius: 18px;
+
+            border: 1px solid rgba(255,255,255,0.12);
+
+            outline: none;
+
+            color: white;
+            background: rgba(0,0,0,0.23);
+
+            font-size: 16px;
+            line-height: 1.5;
+
+            transition: 0.25s;
+        }
+
+        textarea::placeholder {
+            color: #8f97c5;
+        }
+
+        textarea:focus {
+            border-color: #816bff;
+            box-shadow: 0 0 0 3px rgba(129,107,255,0.12);
+        }
+
+        .tools {
+            margin-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .left-tools {
+            display: flex;
+            gap: 9px;
+        }
+
+        .tool-btn {
+            padding: 10px 14px;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .ask-btn {
+            padding: 13px 25px;
+            border-radius: 12px;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            background: linear-gradient(135deg, #685cff, #a946ff);
+
+            box-shadow:
+                0 10px 30px rgba(116, 67, 255, 0.35);
+        }
+
+        .ask-btn:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 15px 35px rgba(116, 67, 255, 0.5);
+        }
+
+        /* RESPONSE */
+
+        .response {
+            margin-top: 20px;
+            padding: 20px;
+
+            min-height: 90px;
+
+            border-radius: 18px;
+
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+
+            display: none;
+        }
+
+        .response.active {
+            display: block;
+        }
+
+        .response-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        #answer {
+            color: #d6d9f7;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* FEATURES */
+
+        .features {
+            width: min(1050px, 92%);
+            margin: 55px auto 80px;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature {
+            padding: 25px;
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.1);
+
+            backdrop-filter: blur(15px);
+
+            transition: 0.25s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.09);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .feature h3 {
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            color: #aeb5dc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #858dbb;
+            font-size: 13px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+
+            background: rgba(0,0,0,0.65);
+
+            align-items: center;
+            justify-content: center;
+
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-box {
+            width: min(420px, 100%);
+            padding: 30px;
+
+            border-radius: 22px;
+
+            background: #111743;
+            border: 1px solid rgba(255,255,255,0.12);
+
+            box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+        }
+
+        .modal-box h2 {
+            margin-bottom: 18px;
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 13px;
+            margin: 7px 0;
+
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+
+            background: rgba(0,0,0,0.25);
+            color: white;
+            outline: none;
+        }
+
+        .modal-action {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+
+            border-radius: 10px;
+
+            background: linear-gradient(135deg, #695cff, #a44cff);
+
+            font-weight: 700;
+        }
+
+        .close {
+            float: right;
+            font-size: 22px;
+            cursor: pointer;
+            color: #aeb5dc;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            nav {
+                padding: 18px 4%;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .nav-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .subscribe {
+                padding: 9px 12px;
+                font-size: 12px;
+            }
+
+            .hero {
+                padding-top: 45px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .tools {
+                align-items: stretch;
+            }
+
+            .ask-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <div class="logo">
+            Solve<span>WithAI</span>
+        </div>
+
+        <div class="nav-buttons">
+
+            <button class="nav-btn" onclick="openModal('login')">
+                Login
+            </button>
+
+            <button class="nav-btn" onclick="openModal('register')">
+                Register
+            </button>
+
+            <button class="subscribe" onclick="openSubscription()">
+                ₹1,999 / month
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="badge">
+            ✦ Your Intelligent AI Study Assistant
+        </div>
+
+        <h1>
+            SolveWithAI
+        </h1>
+
+        <p>
+            Ask questions, upload problems, speak your doubts,
+            and let AI help you understand the solution.
+        </p>
+
+    </section>
+
+
+    <!-- AI WORKSPACE -->
+
+    <main class="workspace">
+
+        <div class="ai-card">
+
+            <div class="card-title">
+
+                <div class="ai-icon">
+                    ✨
+                </div>
+
+                <div>
+                    <h2>Ask SolveWithAI</h2>
+                    <p>Describe your problem below</p>
+                </div>
+
+            </div>
+
+
+            <textarea
+                id="problem"
+                placeholder="Type your question here...
+
+Example:
+Explain why the sky appears blue.
+Solve this mathematics problem.
+Explain this chemistry equation.
+Help me understand this chapter..."
+            ></textarea>
+
+
+            <div class="tools">
+
+                <div class="left-tools">
+
+                    <label for="fileInput" class="tool-btn">
+                        📎 Attach
+                    </label>
+
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept="image/*,.pdf,.doc,.docx,.txt"
+                    >
+
+                    <button
+                        class="tool-btn"
+                        onclick="startVoice()"
+                        id="micBtn"
+                    >
+                        🎤 Speak
+                    </button>
+
+                    <button
+                        class="tool-btn"
+                        onclick="clearProblem()"
+                    >
+                        🗑 Clear
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="ask-btn"
+                    onclick="solveProblem()"
+                >
+                    ✨ Ask SolveWithAI
+                </button>
+
+            </div>
+
+
+            <div class="response" id="response">
+
+                <div class="response-title">
+                    🤖 SolveWithAI
+                </div>
+
+                <div id="answer">
+                    Your AI solution will appear here.
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- FEATURES -->
+
+    <section class="features">
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🧠
+            </div>
+
+            <h3>AI Problem Solving</h3>
+
+            <p>
+                Get step-by-step explanations for questions
+                across different subjects.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                🎤
+            </div>
+
+            <h3>Voice Questions</h3>
+
+            <p>
+                Speak your question instead of typing it.
+                Perfect for quick doubts.
+            </p>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">
+                📎
+            </div>
+
+            <h3>Upload Problems</h3>
+
+            <p>
+                Upload images, documents and other files
+                containing your questions.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+        © 2026 SolveWithAI • Learn smarter. Solve faster.
+    </footer>
+
+
+    <!-- LOGIN / REGISTER MODAL -->
+
+    <div class="modal" id="modal">
+
+        <div class="modal-box">
+
+            <span class="close" onclick="closeModal()">
+                ×
+            </span>
+
+            <h2 id="modalTitle">
+                Login
+            </h2>
+
+            <input
+                type="email"
+                placeholder="Email address"
+            >
+
+            <input
+                type="password"
+                placeholder="Password"
+            >
+
+            <button class="modal-action">
+                Continue
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* LOGIN / REGISTER */
+
+        function openModal(type) {
+
+            const modal = document.getElementById("modal");
+            const title = document.getElementById("modalTitle");
+
+            if (type === "login") {
+                title.innerText = "Welcome Back 👋";
+            } else {
+                title.innerText = "Create Your Account 🚀";
+            }
+
+            modal.classList.add("show");
+        }
+
+
+        function closeModal() {
+
+            document
+                .getElementById("modal")
+                .classList.remove("show");
+
+        }
+
+
+        /* SUBSCRIPTION */
+
+        function openSubscription() {
+
+            alert(
+                "SolveWithAI Premium\n\n" +
+                "₹1,999 per month\n\n" +
+                "Payment gateway can be connected here."
+            );
+
+        }
+
+
+        /* CLEAR */
+
+        function clearProblem() {
+
+            document.getElementById("problem").value = "";
+
+            document.getElementById("response")
+                .classList.remove("active");
+
+        }
+
+
+        /* FILE UPLOAD */
+
+        document
+            .getElementById("fileInput")
+            .addEventListener("change", function() {
+
+                if (this.files.length > 0) {
+
+                    document.getElementById("problem").value +=
+                        "\n\n📎 Attached: " +
+                        this.files[0].name;
+
+                }
+
+            });
+
+
+        /* VOICE INPUT */
+
+        function startVoice() {
+
+            const SpeechRecognition =
+                window.SpeechRecognition ||
+                window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+
+                alert(
+                    "Voice recognition is not supported in this browser."
+                );
+
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+
+            recognition.lang = "en-IN";
+            recognition.continuous = false;
+
+            const mic =
+                document.getElementById("micBtn");
+
+            mic.innerText = "🔴 Listening...";
+
+            recognition.start();
+
+            recognition.onresult = function(event) {
+
+                const text =
+                    event.results[0][0].transcript;
+
+                document.getElementById("problem").value +=
+                    (document.getElementById("problem").value
+                        ? "\n"
+                        : "") + text;
+
+            };
+
+            recognition.onend = function() {
+
+                mic.innerText = "🎤 Speak";
+
+            };
+
+        }
+
+
+        /* DEMO AI RESPONSE */
+
+        function solveProblem() {
+
+            const problem =
+                document.getElementById("problem").value.trim();
+
+            const response =
+                document.getElementById("response");
+
+            const answer =
+                document.getElementById("answer");
+
+
+            if (!problem) {
+
+                alert(
+                    "Please enter or speak a problem first."
+                );
+
+                return;
+            }
+
+
+            response.classList.add("active");
+
+            answer.innerText =
+                "🤖 Thinking...\n\n" +
+                "Your AI backend is not connected yet.\n\n" +
+                "Once you connect SolveWithAI to an AI API, " +
+                "the user's question will be sent to the AI " +
+                "and the real solution will appear here.";
+
+        }
+
+
+        /* CLOSE MODAL WHEN CLICKING OUTSIDE */
+
+        window.onclick = function(event) {
+
+            const modal =
+                document.getElementById("modal");
+
+            if (event.target === modal) {
+                closeModal();
+            }
+
+        };
+
+    </script>
+
+</body>
+</html>
+```
